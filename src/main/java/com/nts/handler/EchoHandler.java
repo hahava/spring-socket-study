@@ -1,23 +1,18 @@
 package com.nts.handler;
 
 import lombok.extern.java.Log;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Controller;
 
 @Log
-public class EchoHandler extends TextWebSocketHandler {
+@Controller
+public class EchoHandler {
 
-	@Override
-	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		session.sendMessage(new TextMessage("hello socket"));
-		log.info("socket on");
+	@MessageMapping("/echo")
+	@SendTo("/topic/echo")
+	public String echo(String msg) {
+		return "RECEIVE : " + msg;
 	}
 
-	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		String msg = message.getPayload();
-		session.sendMessage(new TextMessage(msg));
-		log.info(msg);
-	}
 }

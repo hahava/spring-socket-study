@@ -1,40 +1,30 @@
 package com.nts.config;
 
-import com.nts.handler.EchoHandler;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-
-import java.util.concurrent.TimeUnit;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
-@EnableWebSocket
+@EnableWebSocketMessageBroker
 @ComponentScan(basePackages = {"com.nts"})
-public class WebSocketConfig implements WebSocketConfigurer {
-
-	private final static int MESSAGE_BUFFER_SIZE = 16384;
-
-	@Bean
-	public ServletServerContainerFactoryBean configureWebSocket() {
-		ServletServerContainerFactoryBean factory = new ServletServerContainerFactoryBean();
-		factory.setMaxBinaryMessageBufferSize(MESSAGE_BUFFER_SIZE);
-		factory.setMaxTextMessageBufferSize(MESSAGE_BUFFER_SIZE);
-		factory.setMaxSessionIdleTimeout(TimeUnit.MINUTES.convert(30, TimeUnit.MILLISECONDS));
-		factory.setAsyncSendTimeout(TimeUnit.SECONDS.convert(5, TimeUnit.MILLISECONDS));
-		return factory;
-	}
-
-	@Bean
-	public EchoHandler echoHandler() {
-		return new EchoHandler();
-	}
-
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
-	public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
-		webSocketHandlerRegistry.addHandler(echoHandler(), "/echo").setAllowedOrigins("*");
+	public void configureMessageBroker(MessageBrokerRegistry registry) {
+		// 중계기로 전달
+		registry.enableSimpleBroker("/topic");
+		// 해들러 메서드로 전달한다.
+		registry.setApplicationDestinationPrefixes("/app");
+	}
+
+	/**
+	 * 최초 handshake 시에 맵핑되는 요청 주소
+	 * @param registry
+	 */
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint("/echo-endpoint").setAllowedOrigins("*").withSockJS();
 	}
 }
