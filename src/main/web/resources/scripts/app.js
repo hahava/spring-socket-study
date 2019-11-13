@@ -1,5 +1,5 @@
 let ws;
-const url = "ws://localhost:8080/echo";
+const url = "ws://localhost:8080/echo-endpoint";
 
 const tagElement = {
     "board": document.getElementById("board"),
@@ -28,37 +28,29 @@ const tagElement = {
     }
 }
 
-const connect = function () {
-    ws = new WebSocket(url);
-
-    ws.onopen = function (event) {
-        console.log(event.type)
-    };
-
-    ws.onmessage = function (event) {
-        console.log(event);
-        log(event.data);
-    };
-
-    ws.onclose = function (event) {
-        const closingMent = "----------connections is closed....-------------";
-        log(closingMent);
-    };
+const connect = () => {
+    // handshake를 위한 메서드
+    ws = webstomp.client(url);
+    ws.connect({}, () => {
+        ws.subscribe('/topic/echo', (message) => {
+            log(message.body);
+        })
+    })
 };
 
-const echo = function () {
+const echo = () => {
     if (ws != null) {
         let data = {
             "message": document.getElementById('message').value,
             "id": document.getElementById('id').value
         };
-        ws.send(JSON.stringify(data));
+        ws.send('/app/echo', JSON.stringify(data));
     } else {
         connect();
     }
 };
 
-const log = function (message) {
+const log = (message) => {
     let board = document.getElementById('board');
     let data = JSON.parse(message);
 
@@ -69,5 +61,4 @@ const log = function (message) {
     row.appendChild(divId);
     row.appendChild(divContent);
     board.appendChild(row);
-
 };

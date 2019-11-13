@@ -26,8 +26,9 @@
         </div>
     </div>
 </div>
-
+<script type="text/javascript" src="/webjars/webstomp-client/1.0.6/dist/webstomp.js"></script>
 <script type="text/javascript" src="/webjars/jquery/3.0.0/jquery.js/"></script>
 <script type="text/javascript" src="/resources/scripts/app.js"></script>
+<script type="text/javascript" src="/webjars/stomp-websocket/2.3.1/stomp.js"></script>
 </body>
 </html>

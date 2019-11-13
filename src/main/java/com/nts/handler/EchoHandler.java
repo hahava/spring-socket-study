@@ -8,11 +8,10 @@ import org.springframework.stereotype.Controller;
 @Log
 @Controller
 public class EchoHandler {
-
-	@MessageMapping("/echo")
 	@SendTo("/topic/echo")
-	public String echo(String msg) {
-		return "RECEIVE : " + msg;
+	@MessageMapping("/echo")
+	public String answer(String msg) {
+		return msg;
 	}
 
 }
